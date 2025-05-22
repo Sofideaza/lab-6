@@ -9,7 +9,20 @@ class HomePage extends HTMLElement {
         </main>
       </section>
     `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .home-page {
+        display: flex;
+      }
+
+      .main-board {
+        margin-left: 240px;
+        width: 100%;
+        padding: 2rem;
+      }
+    `;
+    this.appendChild(style);
   }
 }
-
 customElements.define('home-page', HomePage);
