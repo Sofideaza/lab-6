@@ -1,0 +1,2 @@
+#!/bm/sh
+npm run lint
