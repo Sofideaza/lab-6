@@ -1,5 +1,14 @@
+import { auth } from '../firebase/config';
+import { navigateTo } from '../router';
+
 class HomePage extends HTMLElement {
   connectedCallback() {
+    if (!auth.currentUser) {
+      console.warn("Usuario no autenticado. Redirigiendo al login...");
+      navigateTo('/login');
+      return;
+    }
+
     this.innerHTML = `
       <section class="home-page">
         <sidebar-component></sidebar-component>
@@ -22,7 +31,9 @@ class HomePage extends HTMLElement {
         padding: 2rem;
       }
     `;
+
     this.appendChild(style);
   }
 }
+
 customElements.define('home-page', HomePage);
