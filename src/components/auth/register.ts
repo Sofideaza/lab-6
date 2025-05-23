@@ -1,71 +1,90 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { navigateTo } from '../../router';
 
 class RegisterForm extends HTMLElement {
   connectedCallback() {
     const shadow = this.attachShadow({ mode: 'open' });
+
     shadow.innerHTML = `
       <style>
-        .register-form {
-          background-color: var(--color-card-bg);
-          padding: 2rem;
+        :host {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background: var(--color-bg);
+        }
+        .card {
+          background: white;
           border-radius: var(--radius);
           box-shadow: var(--shadow);
+          padding: 2rem;
+          width: 100%;
           max-width: 400px;
-          margin: 2rem auto;
           display: flex;
           flex-direction: column;
           gap: 1rem;
         }
-
-        .register-form h2 {
+        h2 {
           text-align: center;
           color: var(--color-primary);
         }
-
-        .register-form input {
+        input {
           padding: 0.75rem;
           border: 1px solid var(--color-border);
           border-radius: var(--radius);
+          font-size: 1rem;
         }
-
-        .register-form button {
+        button {
           background-color: var(--color-primary);
           color: white;
           padding: 0.75rem;
           border: none;
           border-radius: var(--radius);
+          font-size: 1rem;
+          cursor: pointer;
         }
-
-        .register-form button:hover {
-          background-color: #327ad7;
+        button:hover {
+          opacity: 0.95;
+        }
+        .link {
+          text-align: center;
+          font-size: 0.9rem;
+        }
+        .link a {
+          color: var(--color-primary);
+          cursor: pointer;
+          text-decoration: underline;
         }
       </style>
 
-      <form class="register-form">
+      <form class="card">
         <h2>Registrarse</h2>
-        <input type="email" id="register-email" placeholder="Correo" required />
-        <input type="password" id="register-password" placeholder="Contraseña" required />
+        <input type="email" placeholder="Correo electrónico" required />
+        <input type="password" placeholder="Contraseña" required />
         <button type="submit">Crear cuenta</button>
+        <div class="link">¿Ya tienes cuenta? <a id="go-login">Inicia sesión aquí</a></div>
       </form>
     `;
 
-    shadow.querySelector('form')?.addEventListener('submit', this.handleRegister.bind(this));
-  }
+    shadow.querySelector('form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const inputs = shadow.querySelectorAll('input');
+      const email = (inputs[0] as HTMLInputElement).value;
+      const password = (inputs[1] as HTMLInputElement).value;
 
-  async handleRegister(e: Event) {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const email = (form.querySelector('#register-email') as HTMLInputElement).value;
-    const password = (form.querySelector('#register-password') as HTMLInputElement).value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        navigateTo('/home');
+      } catch {
+        alert('No se pudo crear la cuenta.');
+      }
+    });
 
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigateTo('/home');
-    } catch {
-      alert('Error al registrar. Revisa los datos.');
-    }
+    shadow.getElementById('go-login')?.addEventListener('click', () => {
+      navigateTo('/login');
+    });
   }
 }
 

@@ -1,5 +1,4 @@
 import './styles/global.css';
-import './pages/authPage';
 import './pages/homePage';
 import './components/auth/login';
 import './components/auth/register';
